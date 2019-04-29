@@ -47,8 +47,11 @@ public:
     }
     Point2D project(float r, float yp)
     {
-        if ((y - yp) > -3) {vis = 1;} else {vis = 0;}
-        Point2D ret(r*x/z, r*(((y - yp)>-3)?(y - yp):(-3))/z, c);
+        //int sea_level = 3;
+        //if ((y - yp) > -sea_level) {vis = 1;} else {vis = 0;}
+        //Point2D ret(r*x/z, r*(((y - yp)>-sea_level)?(y - yp):(-sea_level))/z, c);
+        if ((y ) > sea_level) {vis = 1;} else {vis = 0;}
+        Point2D ret(r*x/z, r*((((y )>sea_level)?(y ):(sea_level)) - yp)/z, c);
         return ret;
     }
 };
@@ -71,8 +74,10 @@ public:
         for (int i = 0; i < 3; i ++) p_proj[i] = p[i].project(300, yp);
         ConvexShape polygon;
         polygon.setPointCount(3);
-        polygon.setFillColor(p[0].c);
-        for (int i = 0; i < 3; i ++) polygon.setPoint(i, Vector2f(432/2 + p_proj[i].x, 768 - 50 - 432/2 - p_proj[i].y));
+        Color outColor;
+        //outColor = Color(p[0].c);
+        polygon.setFillColor(p[0].c );
+        for (int i = 0; i < 3; i ++) polygon.setPoint(i, Vector2f(432/2 + p_proj[i].x, 768 - 150 - 432/2 - p_proj[i].y));
         window->draw(polygon);
         vis = (int)p[0].vis + (int)p[1].vis + (int)p[2].vis;
     }
