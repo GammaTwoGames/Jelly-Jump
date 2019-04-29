@@ -26,7 +26,7 @@ using namespace sf;
 
 int main()
 {
-    RenderWindow window(sf::VideoMode(432, 668),"2048 - Balls",  Style::Titlebar );
+    RenderWindow window(sf::VideoMode(432, 668),"Jelly Jump 0.3.5",  Style::Titlebar );
     Clock clock;
 
     Walls wall(2);
@@ -43,14 +43,14 @@ int main()
 
         double time = clock.getElapsedTime().asMicroseconds();
         clock.restart();
-        cout<<jelly.get_speed()<<"\n";
+        cout<<1e6/time<<"\n";
         time = time/1.8e5*0.6;
         time = (time > 0.5)?0.5:time;
 
         Vector2i pixelPos = Mouse::getPosition(window);
         Vector2f pos = window.mapPixelToCoords(pixelPos);
 
-        sea.app(&zi);
+        sea.app(time);
         sea.draw(&window, z);
 
         wall.app(&zi);
@@ -64,7 +64,7 @@ int main()
         jelly.app(time);
         jelly.draw(&window, z);
 
-        sea_level += time/17;
+        sea_level += time/2.7;
 
         zi += jelly.get_speed()*time;
 
