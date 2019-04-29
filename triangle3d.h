@@ -77,7 +77,7 @@ public:
         Color outColor;
         //outColor = Color(p[0].c);
         polygon.setFillColor(p[0].c );
-        for (int i = 0; i < 3; i ++) polygon.setPoint(i, Vector2f(432/2 + p_proj[i].x, 768 - 150 - 432/2 - p_proj[i].y));
+        for (int i = 0; i < 3; i ++) polygon.setPoint(i, Vector2f(432/2 + p_proj[i].x, 768 - 250 - 432/2 - p_proj[i].y));
         window->draw(polygon);
         vis = (int)p[0].vis + (int)p[1].vis + (int)p[2].vis;
     }

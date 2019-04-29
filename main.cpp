@@ -26,12 +26,13 @@ using namespace sf;
 
 int main()
 {
-    RenderWindow window(sf::VideoMode(432, 768),"2048 - Balls",  Style::None );
+    RenderWindow window(sf::VideoMode(432, 668),"2048 - Balls",  Style::Titlebar );
     Clock clock;
 
     Walls wall(2);
     Sea sea(2);
     Jelly jelly(2);
+    Barrier barrier(10, 6);
 
     float zi = 0;
 
@@ -42,7 +43,7 @@ int main()
 
         double time = clock.getElapsedTime().asMicroseconds();
         clock.restart();
-        cout<<z<<"\n";
+        cout<<jelly.get_speed()<<"\n";
         time = time/1.8e5*0.6;
         time = (time > 0.5)?0.5:time;
 
@@ -55,8 +56,19 @@ int main()
         wall.app(&zi);
         wall.draw(&window, z);
 
+        barrier.app(time);
+        barrier.draw(&window, z);
+
+        //z = jelly.get_z() + 3;
+        z += 3*(2.5 + jelly.get_z() - z)*time;
         jelly.app(time);
         jelly.draw(&window, z);
+
+        sea_level += time/17;
+
+        zi += jelly.get_speed()*time;
+
+        if (jelly.get_z() + 0.5 < sea_level) break;
 
 
         sf::Event event;
@@ -84,11 +96,6 @@ int main()
                 {
                 }
         }
-
-        sea_level += time/2;
-
-        z = jelly.get_z() + 3;
-        zi += jelly.get_speed()*time;
 
 		if (Keyboard::isKeyPressed(Keyboard::Up)) { z += time; zi += time; } //вторая координата (У) отрицательна =>идём вверх (вспоминаем из предыдущих уроков почему именно вверх, а не вниз)
 		if (Keyboard::isKeyPressed(Keyboard::Down)) { z -= time; zi -= time; }

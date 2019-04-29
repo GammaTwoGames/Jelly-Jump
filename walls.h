@@ -85,4 +85,32 @@ public:
 
 };
 
+class Barrier : public Pol_struct
+{
+private:
+    float Time;
+    float open, u, t_start, zp;
+public:
+    Barrier(float T_start, int Z)
+    {
+        t_start = T_start;
+        Time = 0;
+        open = 5;
+        u =  (0.5 + (rand()%10)/5.0)/2;
+        zp = Z;
+    }
+    void app(float time)
+    {
+        Time += time;
+        if (Time > t_start) if (open > 0) open -= time*u;
+        polygons.clear();
+        if (sea_level < -2)
+        {
+            push_rect_contr(&polygons, -5,    -2.5 + zp, 4 , 5 - open, 0.5, 1, 0);
+            push_rect_contr(&polygons,  open, -2.5 + zp, 4 , 5 - open, 0.5, 1, 1);
+        }
+    }
+
+};
+
 #endif // WALLS_H_INCLUDED
