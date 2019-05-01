@@ -81,11 +81,17 @@ public:
         polygons.clear();
         float d_l = ball.uz/25*(1 - sin(ball.uz*7));
         if (d_l < 0) d_l = 0;
-        push_rect_orange(&polygons, -0.5 + d_l , ball.zb , 4 + d_l, 1 - 2*d_l, 1 + 2*d_l, 0.5 - 2*d_l, 0);
+        push_rect_orange(&polygons, -0.5 + d_l + ball.xb, ball.zb , 4 + d_l, 1 - 2*d_l, 1 + 2*d_l, 0.5 - 2*d_l, 0);
+        push_rect_orange(&polygons, -0.5 + d_l + ball.xb, ball.zb , 4 + d_l, 1 - 2*d_l, 1 + 2*d_l, 0.5 - 2*d_l, 1);
     }
     void jump()
     {
         ball.jump();
+    }
+
+    void set_ux(float ux)
+    {
+        ball.ux = ux;
     }
 
     float get_speed()
@@ -118,7 +124,7 @@ public:
         Time += time;
         if (Time > t_start) if (open > 0) open -= time*u;
         polygons.clear();
-        if (sea_level < -2)
+        if (sea_level < zp)
         {
             push_rect_contr(&polygons, -5,    -2.5 + zp, 4 , 5 - open, 0.5, 1, 0);
             push_rect_contr(&polygons,  open, -2.5 + zp, 4 , 5 - open, 0.5, 1, 1);
@@ -129,49 +135,87 @@ public:
 
 class STL_file : public Pol_struct
 {
-
+private:
+    float Time;
+    float x0, y0, z0;
 public:
     float norm_z;
-    STL_file(int zz, string file_name)
+    vector<Triangle_transformable> pre_tri;
+    STL_file(float X0, float Y0, float Z0, int zz, string file_name)
     {
-        ifstream fin(file_name);
+        Time = 0;
+        x0 = X0;
+        y0 = Y0;
+        z0 = Z0;
 
-        float ff;
+        ofstream fout;
+        fout.open("buffer.txt", ios::trunc);
 
+        FILE *fp;
+        fp = fopen("platform3.stl", "r");
 
-        norm_z = 100;
+        char ch, ch_p;
+        ch = getc(fp);
+        ch = getc(fp);
+        ch_p = ch;
 
-        for (int i = 0; i < 91+1; i ++)
+        int num_pol = 0;
+
+        while (ch != 's')
+        {
+            ch = getc(fp);
+            if (((ch > 47) && (ch < 58)) || (ch == '.') || (ch == '+') || (ch == '-') || (ch == 'E') || ((ch == 'e') && ((ch_p > 47) && (ch_p < 58))) || (ch == '\n'))
+            {
+                if (ch == '\n')
+                    num_pol++;
+                fout << ch;
+            }
+            else
+                fout << ' ';
+            ch_p = ch;
+        }
+
+        num_pol--;
+        num_pol /= 7;
+
+        fout.close();
+        //return 0;
+
+        ifstream fin("buffer.txt");
+
+        for (int i = 0; i < num_pol + 1; i ++)
         {
             float nor[3];
             for (int j = 0; j < 3; j ++)
             {
                 fin >> nor[j];
             }
-            float col;
-            col = ((0.9 + 0.1*nor[1]));
+            //float col;
+            //col = ((0.9 + 0.1*nor[2]));
 
-            float x1[3], x2[3], x3[3];
+            float x[3][3];
+            for (int k = 0; k < 3; k ++)
+                for (int j = 0; j < 3; j ++)
+                {
+                    fin >> x[k][j];
+                    x[k][j] = (float)(x[k][j] / 1.0);
+                }
 
-            for (int j = 0; j < 3; j ++)
-            {
-                fin >> x1[j];
-                x1[j] = (float)(x1[j] / 1.0);
-            }
-            for (int j = 0; j < 3; j ++)
-            {
-                fin >> x2[j];
-                x2[j] = x2[j] / 1.0;
-            }
-            for (int j = 0; j < 3; j ++)
-            {
-                fin >> x3[j];
-                x3[j] = x3[j] / 1.0;
-            }
-            polygons.push_back(Triangle3D(Point3D(-2+x1[0],7+x1[1],(8+x1[2])/2.0,Color(255,203*col,0*col)),
-                                          Point3D(-2+x2[0],7+x2[1],(8+x2[2])/2.0,Color(col,col,col)),
-                                          Point3D(-2+x3[0],7+x3[1],(8+x3[2])/2.0,Color(col,col,col))
-                                         ));
+            float col = ((0.9 + 0.1*nor[2]));
+            polygons.push_back(Triangle3D(Point3D(x0+x[0][0],y0+x[0][2],(z0+x[0][1])/2.0,Color(255,203*col,0*col)),
+                                          Point3D(x0+x[1][0],y0+x[1][2],(z0+x[1][1])/2.0,Color(col,col,col)),
+                                          Point3D(x0+x[2][0],y0+x[2][2],(z0+x[2][1])/2.0,Color(col,col,col)), nor[2]
+                                          ));
+        }
+    }
+
+    void app(float time)
+    {
+        Time += time;
+        for (int i = 0; i < polygons.size(); i ++)
+        {
+            polygons[i].abel_transformation(-2,7,8,1,Time);
+            polygons[i].culc_color(Color(240,240,255));
         }
     }
 

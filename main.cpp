@@ -8,7 +8,7 @@
 #include <string>
 
 float z = 2;
-float sea_level = -5;
+float sea_level = -10;
 
 #include "triangle3d.h"
 
@@ -34,29 +34,10 @@ int main()
     Walls wall(2);
     Sea sea(2);
     Jelly jelly(2);
-    Barrier barrier(10, 6);
-    STL_file object(2,"sphere2.txt");
+    Barrier barrier(0, 0);
+    STL_file object(-2,4,8.5,2,"sphere2.txt");
 
     float zi = 0;
-
-            char ff;
-            unsigned int cu;
-            float hey;
-            ifstream in("Utah_teapot_(solid).stl",ios::binary);
-            for (int i = 0; i < 80; i ++)
-            {
-                in.read((char*)&ff, sizeof(ff));
-            }
-            in.read((char*)&cu, sizeof(cu));
-
-            for (int i = 0; i < 180; i ++)
-            {
-                in.read((char*)&hey, sizeof(hey));
-                cout<<hey<<endl;
-            }
-
-            cout<<hey;
-
 
     while (window.isOpen())
     {
@@ -65,7 +46,7 @@ int main()
 
         double time = clock.getElapsedTime().asMicroseconds();
         clock.restart();
-        //cout<<fff<<"\n";
+//        cout<<object.get_size()<<"\n";
         time = time/1.8e5*0.6;
         time = (time > 0.5)?0.5:time;
 
@@ -81,14 +62,16 @@ int main()
         barrier.app(time);
         barrier.draw(&window, z);
 
+        object.app(0);
+        object.draw(&window, z);
+
         //z = jelly.get_z() + 3;
         z += 3*(2.5 + jelly.get_z() - z)*time;
         jelly.app(time);
         jelly.draw(&window, z);
 
-        object.draw(&window, z);
-
-        sea_level += time/2.7;
+        sea_level += time/2.5;
+        if (z-sea_level > 10) sea_level = z - 10;
 
         zi += jelly.get_speed()*time;
 
@@ -105,7 +88,7 @@ int main()
                 {
                     window.close();
                 }
-                if (event.key.code == sf::Keyboard::Space)
+                if (event.key.code == sf::Keyboard::Up)
                 {
                     jelly.jump();
                 }
@@ -121,8 +104,12 @@ int main()
                 }
         }
 
-		if (Keyboard::isKeyPressed(Keyboard::Up)) { z += time; zi += time; } //вторая координата (У) отрицательна =>идём вверх (вспоминаем из предыдущих уроков почему именно вверх, а не вниз)
-		if (Keyboard::isKeyPressed(Keyboard::Down)) { z -= time; zi -= time; }
+		//if (Keyboard::isKeyPressed(Keyboard::Up)) { z += time; zi += time; } //вторая координата (У) отрицательна =>идём вверх (вспоминаем из предыдущих уроков почему именно вверх, а не вниз)
+		//if (Keyboard::isKeyPressed(Keyboard::Down)) { z -= time; zi -= time; }
+
+		jelly.set_ux(0);
+		if (Keyboard::isKeyPressed(Keyboard::Right)) { jelly.set_ux(1); } //вторая координата (У) отрицательна =>идём вверх (вспоминаем из предыдущих уроков почему именно вверх, а не вниз)
+		if (Keyboard::isKeyPressed(Keyboard::Left)) { jelly.set_ux(-1); }
 
 
         window.setMouseCursorVisible(1);
