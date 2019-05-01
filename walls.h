@@ -10,6 +10,8 @@ using namespace sf;
 #include "rectangle.h"
 #include "pol_arr.h"
 #include "ball.h"
+#include <fstream>
+#include <string>
 
 class Walls : public Pol_struct
 {
@@ -123,6 +125,60 @@ public:
         }
     }
 
+};
+
+class STL_file : public Pol_struct
+{
+
+public:
+    float norm_z;
+    STL_file(int zz, string file_name)
+    {
+        ifstream fin(file_name);
+
+        float ff;
+
+
+        norm_z = 100;
+
+        for (int i = 0; i < 91+1; i ++)
+        {
+            float nor[3];
+            for (int j = 0; j < 3; j ++)
+            {
+                fin >> nor[j];
+            }
+            float col;
+            col = ((0.9 + 0.1*nor[1]));
+
+            float x1[3], x2[3], x3[3];
+
+            for (int j = 0; j < 3; j ++)
+            {
+                fin >> x1[j];
+                x1[j] = (float)(x1[j] / 1.0);
+            }
+            for (int j = 0; j < 3; j ++)
+            {
+                fin >> x2[j];
+                x2[j] = x2[j] / 1.0;
+            }
+            for (int j = 0; j < 3; j ++)
+            {
+                fin >> x3[j];
+                x3[j] = x3[j] / 1.0;
+            }
+            polygons.push_back(Triangle3D(Point3D(-2+x1[0],7+x1[1],(8+x1[2])/2.0,Color(255,203*col,0*col)),
+                                          Point3D(-2+x2[0],7+x2[1],(8+x2[2])/2.0,Color(col,col,col)),
+                                          Point3D(-2+x3[0],7+x3[1],(8+x3[2])/2.0,Color(col,col,col))
+                                         ));
+        }
+    }
+
+    int get_size()
+    {
+        return polygons.size();
+    }
 };
 
 #endif // WALLS_H_INCLUDED

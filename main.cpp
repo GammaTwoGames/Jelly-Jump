@@ -4,6 +4,8 @@
 #include <vector>
 #include <algorithm>
 #include <list>
+#include <fstream>
+#include <string>
 
 float z = 2;
 float sea_level = -5;
@@ -33,8 +35,28 @@ int main()
     Sea sea(2);
     Jelly jelly(2);
     Barrier barrier(10, 6);
+    STL_file object(2,"sphere2.txt");
 
     float zi = 0;
+
+            char ff;
+            unsigned int cu;
+            float hey;
+            ifstream in("Utah_teapot_(solid).stl",ios::binary);
+            for (int i = 0; i < 80; i ++)
+            {
+                in.read((char*)&ff, sizeof(ff));
+            }
+            in.read((char*)&cu, sizeof(cu));
+
+            for (int i = 0; i < 180; i ++)
+            {
+                in.read((char*)&hey, sizeof(hey));
+                cout<<hey<<endl;
+            }
+
+            cout<<hey;
+
 
     while (window.isOpen())
     {
@@ -43,7 +65,7 @@ int main()
 
         double time = clock.getElapsedTime().asMicroseconds();
         clock.restart();
-        cout<<1e6/time<<"\n";
+        //cout<<fff<<"\n";
         time = time/1.8e5*0.6;
         time = (time > 0.5)?0.5:time;
 
@@ -63,6 +85,8 @@ int main()
         z += 3*(2.5 + jelly.get_z() - z)*time;
         jelly.app(time);
         jelly.draw(&window, z);
+
+        object.draw(&window, z);
 
         sea_level += time/2.7;
 
