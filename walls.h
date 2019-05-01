@@ -70,14 +70,17 @@ class Jelly : public Pol_struct
 {
 private:
     Ball ball;
+    bool is_jump;
 public:
     Jelly(int jj)
     {
-
+        is_jump = 0;
     }
-    void app(float time)
+    void app(float time, vector<float> xs, vector<float> zs)
     {
-        ball.app(time);
+        ball.app(time, xs, zs);
+        if (is_jump == 1) {ball.jump(); is_jump = 0;}
+        //cout<<is_jump;
         polygons.clear();
         float d_l = ball.uz/25*(1 - sin(ball.uz*7));
         if (d_l < 0) d_l = 0;
@@ -86,7 +89,7 @@ public:
     }
     void jump()
     {
-        ball.jump();
+        is_jump = 1;
     }
 
     void set_ux(float ux)
@@ -141,7 +144,11 @@ private:
 public:
     float norm_z;
     vector<Triangle_transformable> pre_tri;
-    STL_file(float X0, float Y0, float Z0, int zz, string file_name)
+    STL_file()
+    {
+
+    }
+    STL_file(float X0, float Y0, float Z0, int zz, int name_stl, bool create_buffer, string buffer)
     {
         Time = 0;
         x0 = X0;
@@ -149,10 +156,12 @@ public:
         z0 = Z0;
 
         ofstream fout;
-        fout.open("buffer.txt", ios::trunc);
+        fout.open(buffer, ios::trunc);
 
         FILE *fp;
-        fp = fopen("platform3.stl", "r");
+        char name[] = "1.stl";
+        name[0] = (char)(name_stl + 48);
+        fp = fopen(name, "r");
 
         char ch, ch_p;
         ch = getc(fp);
@@ -181,7 +190,7 @@ public:
         fout.close();
         //return 0;
 
-        ifstream fin("buffer.txt");
+        ifstream fin(buffer);
 
         for (int i = 0; i < num_pol + 1; i ++)
         {
@@ -215,7 +224,7 @@ public:
         for (int i = 0; i < polygons.size(); i ++)
         {
             polygons[i].abel_transformation(-2,7,8,1,Time);
-            polygons[i].culc_color(Color(240,240,255));
+            polygons[i].culc_color(Color(230,230,255));
         }
     }
 
@@ -224,5 +233,26 @@ public:
         return polygons.size();
     }
 };
+
+class Platform
+{
+public:
+    float zi, x;
+    STL_file pls;
+    Platform(int zi_, float x_)
+    {
+        zi = 2 + 4*zi_;
+        x = x_;
+        pls = STL_file(x_,2 + 4*zi_,8.5,2,1,1,"buffer.txt");
+    }
+    void draw(RenderWindow* window, float z)
+    {
+        pls.draw(window, z);
+        pls.app(0);
+    }
+
+};
+
+
 
 #endif // WALLS_H_INCLUDED

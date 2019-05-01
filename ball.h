@@ -7,25 +7,37 @@ class Ball
 {
 private:
     float z0;
+    bool is_jump;
 public:
     float zb, uz;
     float xb, ux;
     Ball()
     {
+        is_jump = 0;
         z0 = -2;
         zb = 0;
         uz = 0.3;
         ux = 0;
         xb = 0;
     }
-    void app(float time)
+    void app(float time, vector<float> xs, vector<float> zs)
     {
+        //is_jump = 0;
         zb += uz*time;
         xb += ux*time;
-        if (xb < -2) xb = -2;
-        if (xb > 2) xb = 2;
-        if (zb > z0) {uz -= time;} else {uz = 0; zb = z0;}
-        if (zb - z0 > 4) z0 += 3;
+        ux -= 0.2*ux*time;
+        if (xb < -3) xb = -3;
+        if (xb > 3) xb = 3;
+        //if (zb > z0) {uz -= 1*time;} else {uz = 0; zb = z0;}
+        //if (zb - z0 > 4) z0 += 4;
+        int touch = -1;
+        for (int i = 0; i < xs.size(); i ++)
+        {
+            if (zb < zs[i] && zb > zs[i] - 0.5 && uz <= 0 && xb > xs[i] - 1 && xb < xs[i] + 1) touch = i;
+        }
+        if (touch == -1) {uz -= 1*time;} else {uz = 0; zb = zs[touch]; if (is_jump == 1) {uz = 3; is_jump = 0;}}
+        //cout<<(bool)(zb < zs[0])<<"  "<<(bool)(zb > zs[0] - 0.5)<<"  "<<(bool)(uz < 0)<<"  "<<(bool)(xb > xs[0] - 0.5)<<endl;
+        //cout<<is_jump<<endl;
     }
     void draw(RenderWindow* window)
     {
@@ -37,7 +49,9 @@ public:
 
     void jump()
     {
-       if (abs(zb - z0) < 0.05) uz = 3.5;
+
+       //if (uz == 0) uz = 3;
+       is_jump = 1;
     }
 
     void set_ux(float UX)
@@ -45,11 +59,11 @@ public:
         ux = UX;
     }
 
-    void touch(float UX)
-    {
-        ux = UX;
-        uz = 0;
-    }
+    //void touch(float UX)
+    //{
+     //   ux = UX;
+     //   uz = 0;
+    //}
 };
 
 #endif // BALL_H_INCLUDED
