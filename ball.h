@@ -15,7 +15,7 @@ public:
     {
         is_jump = 0;
         z0 = -2;
-        zb = 0;
+        zb = 0.1;
         uz = 0.3;
         ux = 0;
         xb = 0;
@@ -25,7 +25,7 @@ public:
         //is_jump = 0;
         zb += uz*time;
         xb += ux*time;
-        ux -= 0.2*ux*time;
+        ux -= 0.3*ux*time;
         if (xb < -3) xb = -3;
         if (xb > 3) xb = 3;
         //if (zb > z0) {uz -= 1*time;} else {uz = 0; zb = z0;}
@@ -38,6 +38,7 @@ public:
         if (touch == -1) {uz -= 1*time;} else {uz = 0; zb = zs[touch]; if (is_jump == 1) {uz = 3; is_jump = 0;}}
         //cout<<(bool)(zb < zs[0])<<"  "<<(bool)(zb > zs[0] - 0.5)<<"  "<<(bool)(uz < 0)<<"  "<<(bool)(xb > xs[0] - 0.5)<<endl;
         //cout<<is_jump<<endl;
+        //uz = 0;
     }
     void draw(RenderWindow* window)
     {

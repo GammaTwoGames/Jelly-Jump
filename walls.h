@@ -143,17 +143,30 @@ private:
     float x0, y0, z0;
 public:
     float norm_z;
-    vector<Triangle_transformable> pre_tri;
+    //vector<Triangle_transformable> pre_tri;
     STL_file()
     {
 
     }
-    STL_file(float X0, float Y0, float Z0, int zz, int name_stl, bool create_buffer, string buffer)
+    STL_file(float X0, float Y0, float Z0, vector<Triangle3D> new_polygons)
+    {
+        polygons = new_polygons;
+        x0 = X0;
+        y0 = Y0;
+        z0 = Z0;
+        Time = 0;
+    }
+    STL_file(float X0, float Y0, float Z0, int zz, int name_stl, bool create_buffer, string buffer, int n_no)
     {
         Time = 0;
         x0 = X0;
         y0 = Y0;
         z0 = Z0;
+
+        int num_pol = 0;
+
+        if (create_buffer)
+        {
 
         ofstream fout;
         fout.open(buffer, ios::trunc);
@@ -167,8 +180,6 @@ public:
         ch = getc(fp);
         ch = getc(fp);
         ch_p = ch;
-
-        int num_pol = 0;
 
         while (ch != 's')
         {
@@ -189,8 +200,11 @@ public:
 
         fout.close();
         //return 0;
+        }
 
         ifstream fin(buffer);
+
+        if (!create_buffer) num_pol = n_no;
 
         for (int i = 0; i < num_pol + 1; i ++)
         {
@@ -232,6 +246,17 @@ public:
     {
         return polygons.size();
     }
+    void change(float X0, float Y0, float Z0)
+    {
+        x0 = X0;
+        y0 = Y0;
+        z0 = Z0;
+        for (int i = 0; i < polygons.size(); i ++)
+        {
+            polygons[i].change(X0,Y0,Z0);
+        }
+    }
+
 };
 
 class Platform
@@ -239,11 +264,22 @@ class Platform
 public:
     float zi, x;
     STL_file pls;
-    Platform(int zi_, float x_)
+    Platform(int zi_, float x_, bool is_first)
     {
         zi = 2 + 4*zi_;
         x = x_;
-        pls = STL_file(x_,2 + 4*zi_,8.5,2,1,1,"buffer.txt");
+        pls = STL_file(x_,2 + 4*zi_,8.5,2,1,is_first,"buffer.txt", 262);
+    }
+    Platform(float zi_, float x_, STL_file stl)
+    {
+        zi = 2 + 4*zi_;
+        x = x_;
+        //STL_file stl228;
+        //stl228 = stl;
+        //stl228.change(x_,zi,8,5);
+        //stl.change(x,zi_,8.5);
+        stl.change(x,zi+2,4.25);
+        pls = stl;
     }
     void draw(RenderWindow* window, float z)
     {

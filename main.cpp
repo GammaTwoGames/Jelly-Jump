@@ -28,20 +28,29 @@ using namespace sf;
 
 int main()
 {
-    cout<<(int)'0';
+    //cout<<(int)'0';
     RenderWindow window(sf::VideoMode(432, 668),"Jelly Jump 0.3.5",  Style::Titlebar );
     Clock clock;
 
+    STL_file stl(0,-2,0,2,1,1,"buffer.txt", 262);
+    //cout<<stl.polygons[30].p[1].y<<endl;
+    //cout<<228;
     Walls wall(2);
     Sea sea(2);
     Jelly jelly(2);
     Barrier barrier(0, 0);
     //STL_file object(-2,2,8.5,2,1,1,"buffer.txt");
-    Platform plat(0,0);
+    //Platform plat(0,0);
     vector<Platform> plats;
-    plats.push_back(Platform(-1,0));
-    for (int i = 0; i < 2; i ++)
-        plats.push_back(Platform(i,rand()%4 - 1));
+    plats.push_back(Platform(-1,0,stl));
+    plats.push_back(Platform(0,0,stl));
+    plats.push_back(Platform(1,0,stl));
+    //stl.change(10,10,40.25);
+    cout<<plats[0].zi<<endl;
+    //for (int i = 0; i < 2; i ++)
+       // plats.push_back(Platform(i,rand()%5 - 2,stl/*.change(i,rand()%5 - 2,8.5)*/));
+    //cout<<1337;
+    int z_gen_plats = 2;
 
     float zi = 0;
 
@@ -52,7 +61,8 @@ int main()
 
         double time = clock.getElapsedTime().asMicroseconds();
         clock.restart();
-        //cout<<1e6/time<<"\n";
+        //if (1e6/time < 40)
+            //cout<<1e6/time<<"\n";
         time = time/1.8e5*0.6*1;
         time = (time > 0.5)?0.5:time;
 
@@ -65,15 +75,16 @@ int main()
         wall.app(&zi);
         wall.draw(&window, z);
 
-        //barrier.app(time);
-        //barrier.draw(&window, z);
+        if (z_gen_plats*4 - z < 4) {plats.push_back(Platform(z_gen_plats,rand()%5 - 2,stl)); z_gen_plats ++;}
 
-        //object.app(0);
-        //object.draw(&window, z);
+        //cout<<z_gen_plats<<endl;
+
         for (int i = 0; i < plats.size(); i ++)
             plats[i].draw(&window, z);
+        //cout<<stl.polygons[0].p_proj[1].y<<endl;
 
-        //z = jelly.get_z() + 3;
+
+
         z += 3*(2.5 + jelly.get_z() - z)*time;
 
         vector<float> xs, zs;
@@ -125,8 +136,8 @@ int main()
 		//if (Keyboard::isKeyPressed(Keyboard::Down)) { z -= time; zi -= time; }
 
 		//jelly.set_ux(0);
-		if (Keyboard::isKeyPressed(Keyboard::Right)) { jelly.set_ux(1); } //вторая координата (У) отрицательна =>идём вверх (вспоминаем из предыдущих уроков почему именно вверх, а не вниз)
-		if (Keyboard::isKeyPressed(Keyboard::Left)) { jelly.set_ux(-1); }
+		if (Keyboard::isKeyPressed(Keyboard::Right)) { jelly.set_ux(1.2); } //вторая координата (У) отрицательна =>идём вверх (вспоминаем из предыдущих уроков почему именно вверх, а не вниз)
+		if (Keyboard::isKeyPressed(Keyboard::Left)) { jelly.set_ux(-1.2); }
 
 
         window.setMouseCursorVisible(1);

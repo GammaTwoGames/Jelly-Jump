@@ -67,15 +67,24 @@ public:
         x = x0 + k1*((x1 - x0)*cos(angle) - (y1 - y0)*sin(angle));
         y = y0 + k1*((y1 - y0)*cos(angle) + (x1 - x0)*sin(angle));
     }
+    void change(float x0, float y0, float z0)
+    {
+        x1 += x0;
+        y1 += y0;
+        z += z0;
+        abel_transform(x0, y0, z0, 1, 0);
+    }
 };
 
 class Triangle3D
 {
 private:
-    Point3D p[3];
-    Point2D p_proj[3];
+    //Point3D p[3];
+    //Point2D p_proj[3];
     float n;
 public:
+    Point3D p[3];
+    Point2D p_proj[3];
     int vis;
     Triangle3D(Point3D P1, Point3D P2, Point3D P3)
     {
@@ -110,6 +119,10 @@ public:
     void abel_transformation(float x0, float y0 ,float z0, float k1, float angle)
     {
         for (int i = 0; i < 3; i ++) p[i].abel_transform(x0,y0,z0,k1,angle);
+    }
+    void change(float x0, float y0 ,float z0)
+    {
+        for (int i = 0; i < 3; i ++) p[i].change(x0,y0,z0);
     }
     void culc_color(Color c)
     {
