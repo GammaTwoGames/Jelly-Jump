@@ -62,7 +62,7 @@ int main()
         double time = clock.getElapsedTime().asMicroseconds();
         clock.restart();
         //if (1e6/time < 40)
-            //cout<<1e6/time<<"\n";
+        cout<<1e6/time<<"\n";
         time = time/1.8e5*0.6*1;
         time = (time > 0.5)?0.5:time;
 
@@ -98,7 +98,7 @@ int main()
         jelly.app(time, xs, zs);
         jelly.draw(&window, z);
 
-        sea_level += time/1.7;
+        sea_level += time/1.2;
         if (z-sea_level > 7) sea_level = z - 7;
 
         zi += jelly.get_speed()*time;

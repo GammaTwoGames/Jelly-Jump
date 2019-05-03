@@ -41,18 +41,19 @@ public:
         polygons.clear();
         Time = 0;
     }
-    float d_z(int y)
+    float d_z(float y, float x)
     {
-        return sin(2*(float)(y) + Time)/2.0;
+        return sin(3*(float)(y) + 3*Time)/1.5*sin(5*x + 1.5*Time); //+ ((float)(rand()%10 - 5))/10;
     }
     void app(float time)
     {
         Time += time;
         polygons.clear();
-        for (int i = - 4; i < 4; i ++)
-        for (int j = 1; j < 16; j ++)
+        for (float i = - 4; i < 4; i ++)
+        for (float j = 1; j < 12.5; j += 0.5)
         {
             int c = j*18;
+            /*
             polygons.push_back(Triangle3D(Point3D(i,sea_level + d_z(j),j,Color(255*j/15,162 + (255-162)*j/15,232 + (255 - 232)*j/15)),
                                         Point3D(i + 1,sea_level + d_z(j),j,Color(c*0.9,c*0.9,c)),
                                         Point3D(i,sea_level + d_z(j+1),j + 1,Color(c*0.9,c*0.9,c))
@@ -60,7 +61,16 @@ public:
             polygons.push_back(Triangle3D(Point3D(i+1,sea_level + d_z(j+1),j+1,Color(136 + (255 - 153)*j/15,219 + (255-219)*j/15,255 + (255 - 255)*j/15)),
                                         Point3D(i + 1,sea_level + d_z(j),j,Color(c*0.8,c*0.8,c)),
                                         Point3D(i,sea_level+ d_z(j+1),j + 1,Color(c*0.8,c*0.8,c))
-                                        ));
+                                        )); */
+
+            polygons.push_back(Triangle3D(Point3D(i    ,sea_level + d_z(j    ,i    ),j      ,Color(255*j/12, 255*j/12, 255*j/12)),
+                                          Point3D(i + 1,sea_level + d_z(j    ,i + 1),j      ),
+                                          Point3D(i    ,sea_level + d_z(j+0.5,i    ),j + 0.5)
+                                         ));
+            polygons.push_back(Triangle3D(Point3D(i + 1,sea_level + d_z(j+0.5,i + 1),j + 0.5,Color(255*j/12, 255*j/12, 255*j/12)),
+                                          Point3D(i + 1,sea_level + d_z(j    ,i + 1),j      ),
+                                          Point3D(i    ,sea_level + d_z(j+0.5,i    ),j + 0.5)
+                                         ));
         }
     }
 
@@ -224,7 +234,7 @@ public:
                     x[k][j] = (float)(x[k][j] / 1.0);
                 }
 
-            float col = ((0.9 + 0.1*nor[2]));
+            float col = ((0.8 + 0.2*nor[2]));
             polygons.push_back(Triangle3D(Point3D(x0+x[0][0],y0+x[0][2],(z0+x[0][1])/2.0,Color(255,203*col,0*col)),
                                           Point3D(x0+x[1][0],y0+x[1][2],(z0+x[1][1])/2.0,Color(col,col,col)),
                                           Point3D(x0+x[2][0],y0+x[2][2],(z0+x[2][1])/2.0,Color(col,col,col)), nor[2]
@@ -238,7 +248,7 @@ public:
         for (int i = 0; i < polygons.size(); i ++)
         {
             polygons[i].abel_transformation(-2,7,8,1,Time);
-            polygons[i].culc_color(Color(230,230,255));
+            polygons[i].culc_color(Color(255,255,245));
         }
     }
 

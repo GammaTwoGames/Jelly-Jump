@@ -126,7 +126,7 @@ public:
     }
     void culc_color(Color c)
     {
-        float col = ((0.9 + 0.1*n));
+        float col = ((0.8 + 0.2*n));
         p[0].c = Color(c.r * col,c.g * col, c.b * col);
     }
 
