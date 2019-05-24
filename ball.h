@@ -15,8 +15,8 @@ public:
     {
         is_jump = 0;
         z0 = -2;
-        zb = 0.1;
-        uz = 0.3;
+        zb = -2;
+        uz = 0;
         ux = 0;
         xb = 0;
     }

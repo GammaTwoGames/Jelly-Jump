@@ -18,18 +18,13 @@ class Walls : public Pol_struct
 private:
     int z_gen;
 public:
-    Walls(int jj)
-    {
-        for (int i = - 1; i < 3; i ++)
-            push_walls_of_level(&polygons, i);
-        z_gen = 3;
-    }
-    void app(float *zi)
-    {
-        if (z_gen*5 - z < 10) {push_walls_of_level(&polygons, z_gen); z_gen++;}
-    }
+    Walls(int jj);
+    void app(float *zi);
+    int get_size();
 
 };
+#include "walls.cpp"
+
 
 class Sea : public Pol_struct
 {
@@ -43,25 +38,16 @@ public:
     }
     float d_z(float y, float x)
     {
-        return sin(3*(float)(y) + 3*Time)/1.5*sin(5*x + 1.5*Time); //+ ((float)(rand()%10 - 5))/10;
+        return sin(3*y + 3*Time)*sin(5*x + 1.5*Time)/1.5; //+ ((float)(rand()%10 - 5))/10;
     }
     void app(float time)
     {
         Time += time;
         polygons.clear();
-        for (float i = - 4; i < 4; i ++)
+        for (float i = - 4; i < 4; i += 1)
         for (float j = 1; j < 12.5; j += 0.5)
         {
             int c = j*18;
-            /*
-            polygons.push_back(Triangle3D(Point3D(i,sea_level + d_z(j),j,Color(255*j/15,162 + (255-162)*j/15,232 + (255 - 232)*j/15)),
-                                        Point3D(i + 1,sea_level + d_z(j),j,Color(c*0.9,c*0.9,c)),
-                                        Point3D(i,sea_level + d_z(j+1),j + 1,Color(c*0.9,c*0.9,c))
-                                        ));
-            polygons.push_back(Triangle3D(Point3D(i+1,sea_level + d_z(j+1),j+1,Color(136 + (255 - 153)*j/15,219 + (255-219)*j/15,255 + (255 - 255)*j/15)),
-                                        Point3D(i + 1,sea_level + d_z(j),j,Color(c*0.8,c*0.8,c)),
-                                        Point3D(i,sea_level+ d_z(j+1),j + 1,Color(c*0.8,c*0.8,c))
-                                        )); */
 
             polygons.push_back(Triangle3D(Point3D(i    ,sea_level + d_z(j    ,i    ),j      ,Color(255*j/12, 255*j/12, 255*j/12)),
                                           Point3D(i + 1,sea_level + d_z(j    ,i + 1),j      ),
@@ -117,6 +103,7 @@ public:
     }
 
 };
+
 
 class Barrier : public Pol_struct
 {
@@ -235,10 +222,11 @@ public:
                 }
 
             float col = ((0.8 + 0.2*nor[2]));
-            polygons.push_back(Triangle3D(Point3D(x0+x[0][0],y0+x[0][2],(z0+x[0][1])/2.0,Color(255,203*col,0*col)),
-                                          Point3D(x0+x[1][0],y0+x[1][2],(z0+x[1][1])/2.0,Color(col,col,col)),
-                                          Point3D(x0+x[2][0],y0+x[2][2],(z0+x[2][1])/2.0,Color(col,col,col)), nor[2]
-                                          ));
+            if (nor[1] < 0.2)
+                polygons.push_back(Triangle3D(Point3D(x0+x[0][0],y0+x[0][2],(z0+x[0][1])/2.0,Color(255,203*col,0*col)),
+                                              Point3D(x0+x[1][0],y0+x[1][2],(z0+x[1][1])/2.0,Color(col,col,col)),
+                                              Point3D(x0+x[2][0],y0+x[2][2],(z0+x[2][1])/2.0,Color(col,col,col)), nor[2]
+                                             ));
         }
     }
 
@@ -266,6 +254,13 @@ public:
             polygons[i].change(X0,Y0,Z0);
         }
     }
+    void change_sise(float xs, float ys, float zs, float k, float angle)
+    {
+        for (int i = 0; i < polygons.size(); i ++)
+        {
+            polygons[i].jelly_transformation(xs,ys,zs,k,angle);
+        }
+    }
 
 };
 
@@ -284,10 +279,6 @@ public:
     {
         zi = 2 + 4*zi_;
         x = x_;
-        //STL_file stl228;
-        //stl228 = stl;
-        //stl228.change(x_,zi,8,5);
-        //stl.change(x,zi_,8.5);
         stl.change(x,zi+2,4.25);
         pls = stl;
     }
@@ -299,6 +290,51 @@ public:
 
 };
 
+class Jelly_stl : public Pol_struct
+{
+private:
+    STL_file stl;
+    Ball ball;
+    bool is_jump;
+public:
+    Jelly_stl(STL_file stl_)
+    {
+        stl = stl_;
+        is_jump = 0;
+        //polygons = stl.polygons;
+    }
+    void app(float time, vector<float> xs, vector<float> zs)
+    {
+        ball.app(time, xs, zs);
+        if (is_jump == 1) {ball.jump(); is_jump = 0;}
+        float d_l = ball.uz/25*(1 - sin(ball.uz*7));
+        if (d_l < 0) d_l = 0;
 
+        STL_file buf_stl = stl;
+        buf_stl.change(ball.xb ,  ball.zb + 0.5  , 4);
+        buf_stl.change_sise(ball.xb ,  ball.zb + 0.5  , 4 , 1 + 0 , ball.xb);
+        buf_stl.change_sise(ball.xb ,  ball.zb + 0.5  , 4 , 1 + 2*d_l , 0);
+        polygons = buf_stl.polygons;
+    }
+    void jump()
+    {
+        is_jump = 1;
+    }
+
+    void set_ux(float ux)
+    {
+        ball.ux = ux;
+    }
+
+    float get_speed()
+    {
+        return ball.uz;
+    }
+    float get_z()
+    {
+        return ball.zb;
+    }
+
+};
 
 #endif // WALLS_H_INCLUDED

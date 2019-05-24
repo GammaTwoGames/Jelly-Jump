@@ -67,6 +67,12 @@ public:
         x = x0 + k1*((x1 - x0)*cos(angle) - (y1 - y0)*sin(angle));
         y = y0 + k1*((y1 - y0)*cos(angle) + (x1 - x0)*sin(angle));
     }
+    void jelly_transform(float x0, float y0, float z0, float k1, float angle)
+    {
+        x = x0 + ((x1 - x0)*cos(angle) - (y1 - y0)*sin(angle))/k1;
+        y = y0 + k1*((y1 - y0)*cos(angle) + (x1 - x0)*sin(angle));
+        //z = z0 + (z1 - z0)/k1;
+    }
     void change(float x0, float y0, float z0)
     {
         x1 += x0;
@@ -119,6 +125,10 @@ public:
     void abel_transformation(float x0, float y0 ,float z0, float k1, float angle)
     {
         for (int i = 0; i < 3; i ++) p[i].abel_transform(x0,y0,z0,k1,angle);
+    }
+    void jelly_transformation(float x0, float y0 ,float z0, float k1, float angle)
+    {
+        for (int i = 0; i < 3; i ++) p[i].jelly_transform(x0,y0,z0,k1,angle);
     }
     void change(float x0, float y0 ,float z0)
     {
